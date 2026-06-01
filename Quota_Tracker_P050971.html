@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quota Tracker – P050971 AMD Website Usability Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink:      #E07878;   /* Savanta coral/salmon – brand accent */
+    --pink-dark: #C45F5F;   /* darker shade for hover */
+    --pink-light:#FAF0EF;   /* very light pink – hover backgrounds */
+    --pink-mid:  #F5DCDA;   /* medium pink – active/selected backgrounds */
+    --dark:      #1C1C1C;   /* near-black – headers, card titles */
+    --bg:        #F8F6F6;   /* warm off-white page background */
+    --bdr:       #E8DCDB;   /* warm grey border */
+    --txt:       #2A2A2A;   /* body text */
+    --muted:     #7A6E6E;   /* secondary/muted text */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', Arial, sans-serif; background: var(--bg); color: var(--txt); font-size: 13px; }
+
+  /* HEADER */
+  .hdr { background: var(--pink); display: flex; align-items: stretch; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .hdr-logo { padding: 14px 24px; display: flex; align-items: center; border-right: 1px solid rgba(255,255,255,0.25); }
+  .savanta-wordmark { display: flex; align-items: baseline; gap: 1px; }
+  .savanta-wordmark .word { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 600; color: #fff; letter-spacing: 0.5px; line-height: 1; }
+  .savanta-wordmark .dots { display: flex; flex-direction: column; gap: 3px; padding-bottom: 2px; margin-left: 1px; }
+  .savanta-wordmark .dot  { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.85); }
+  .hdr-title { padding: 14px 22px; color: #fff; }
+  .hdr-title h1 { font-size: 14px; font-weight: 700; letter-spacing: 0.2px; }
+  .hdr-title p  { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 3px; }
+  .hdr-meta { margin-left: auto; padding: 14px 22px; color: rgba(255,255,255,0.75); font-size: 11px; display: flex; flex-direction: column; justify-content: center; text-align: right; gap: 3px; }
+
+  /* SUMMARY */
+  .sumbar { background: #fff; border-bottom: 2px solid var(--pink); display: flex; padding: 0 22px; flex-wrap: wrap; }
+  .sstat { padding: 13px 26px 13px 0; display: flex; flex-direction: column; border-right: 1px solid var(--bdr); margin-right: 26px; }
+  .sstat:last-child { border-right: none; }
+  .sstat .v { font-size: 24px; font-weight: 700; line-height: 1; }
+  .sstat .l { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* TABS */
+  .tabs { display: flex; background: #fff; border-bottom: 1px solid var(--bdr); padding: 0 22px; overflow-x: auto; }
+  .tab { padding: 11px 18px; cursor: pointer; border-bottom: 3px solid transparent; font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; transition: color 0.15s; }
+  .tab:hover { color: var(--pink); }
+  .tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+  .tab .cnt { background: var(--pink-mid); color: var(--pink-dark); border-radius: 10px; padding: 1px 7px; font-size: 10px; margin-left: 5px; }
+
+  .main { padding: 18px 22px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* MARKET CARD GRID */
+  .mcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+  .mcard { background: #fff; border-radius: 8px; border: 1px solid var(--bdr); overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .mcard-all { border-color: var(--pink); box-shadow: 0 2px 8px rgba(224,120,120,0.18); grid-column: 1 / -1; }
+  .mcard-all .mcard-hdr { background: linear-gradient(135deg, var(--pink-dark) 0%, var(--pink) 100%); }
+  .mcard-hdr { background: var(--dark); color: #fff; padding: 11px 15px; display: flex; justify-content: space-between; align-items: center; }
+  .mcard-hdr h3 { font-size: 13px; font-weight: 700; }
+  .mcard-body { padding: 14px 15px; }
+
+  /* STATUS STRIP */
+  .sbar-wrap { margin-bottom: 10px; }
+  .sbar-lbl { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+  .sbar { height: 7px; border-radius: 4px; background: var(--bdr); display: flex; overflow: hidden; }
+  .s-compl  { background: #27AE60; }
+  .s-sched  { background: var(--pink); }
+  .s-approv { background: #7B8EA8; }
+  .s-new      { background: #E8A030; }
+  .s-invited  { background: #2C5F8A; }
+  .s-prescreen{ background: #C27C00; }
+  .s-backup   { background: #999; }
+  .s-hold     { background: #AAAAAA; }
+  .s-noshow { background: #C0504A; }
+  .s-pipe   { background: #7B8EA8; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; margin-bottom: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+  .pill::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+  .p-new      { background:#FEF3CD; color:#856404; }
+  .p-sched    { background:var(--pink-mid); color:var(--pink-dark); }
+  .p-approved { background:#E8EEF5; color:#4A6080; }
+  .p-invited  { background:#DDE8F5; color:#2C5F8A; }
+  .p-compl    { background:#D4EDDA; color:#155724; }
+  .p-hold     { background:#E8E8E8; color:#555; }
+  .p-noshow   { background:#F8D7DA; color:#721C24; }
+  .p-pipe     { background:#E8EEF5; color:#4A6080; }
+  .p-prescreen{ background:#FFF0D9; color:#8A5A00; }
+  .p-backup   { background:#ECECEC; color:#666; }
+
+  /* QUOTA ACCORDION */
+  .qa { margin-top: 2px; border: 1px solid var(--bdr); border-radius: 6px; overflow: hidden; }
+  .qa + .qa { margin-top: 6px; }
+  .qa-hdr { display: flex; justify-content: space-between; align-items: center; padding: 7px 11px; cursor: pointer; background: var(--bg); user-select: none; transition: background 0.15s; }
+  .qa-hdr:hover { background: var(--pink-light); }
+  .qa-hdr span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--dark); }
+  .qa-hdr .arr { font-size: 10px; color: var(--muted); transition: transform 0.2s; }
+  .qa-hdr.open .arr { transform: rotate(180deg); }
+  .qa-body { display: none; padding: 10px 11px; }
+  .qa-body.open { display: block; }
+
+  table.qt { width: 100%; border-collapse: collapse; }
+  table.qt td { padding: 3px 0; font-size: 11px; }
+  table.qt td:first-child { color: var(--txt); }
+  table.qt td.num { width: 22px; font-weight: 700; color: var(--pink); text-align: center; }
+  table.qt td.bar { width: 60px; }
+  table.qt td.qt-tgt { width: 44px; text-align: center; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 1px 4px; }
+  table.qt td.qt-met   { background: #D4EDDA; color: #155724; }
+  table.qt td.qt-close { background: #FFF3CD; color: #856404; }
+  table.qt td.qt-gap   { background: #F8D7DA; color: #721C24; }
+  table.qt td.qt-over  { background: #F8D7DA; color: #721C24; }
+  table.qt td.qt-notgt { color: var(--muted); background: none; font-weight: 400; }
+  .qt-badges { display:flex; gap:4px; flex-wrap:wrap; }
+  .qt-badge { font-size:10px; font-weight:700; padding:2px 6px; border-radius:10px; white-space:nowrap; }
+  .qt-badge.qt-met   { background:#D4EDDA; color:#155724; }
+  .qt-badge.qt-close { background:#FFF3CD; color:#856404; }
+  .qt-badge.qt-gap   { background:#F8D7DA; color:#721C24; }
+  .qt-legend { font-size:10px; color:var(--muted); margin:6px 0 10px; padding:5px 8px; background:var(--pink-light); border-radius:4px; }
+  .minibar { height: 5px; border-radius: 3px; background: var(--pink); opacity: 0.75; min-width: 3px; }
+  .minibar.amd   { background: #C0504A; }
+  .minibar.intel { background: #0071C5; }
+  .minibar.apple { background: #555; }
+
+  /* RESPONDENT TABLE */
+  .rt-wrap { background: #fff; border-radius: 8px; border: 1px solid var(--bdr); overflow: hidden; }
+  .rt-toolbar { padding: 11px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bdr); }
+  .rt-toolbar h3 { font-size: 13px; font-weight: 700; }
+  .filters { padding: 9px 15px; display: flex; gap: 10px; border-bottom: 1px solid var(--bdr); flex-wrap: wrap; align-items: center; }
+  .filters label { font-size: 10px; color: var(--muted); }
+  select.fsel { padding: 4px 8px; border: 1px solid var(--bdr); border-radius: 4px; font-size: 11px; background: #fff; }
+  select.fsel:focus { outline: none; border-color: var(--pink); }
+  .btn { padding: 6px 13px; border-radius: 5px; border: 1px solid var(--pink); background: #fff; color: var(--pink); font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .btn:hover { background: var(--pink-light); }
+
+  table.rt { width: 100%; border-collapse: collapse; }
+  table.rt thead th { background: var(--dark); color: #fff; padding: 9px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+  table.rt tbody tr { border-bottom: 1px solid var(--bdr); }
+  table.rt tbody tr:hover { background: var(--pink-light); }
+  table.rt tbody td { padding: 8px 10px; vertical-align: top; font-size: 11px; }
+  td.nm { font-weight: 700; }
+  .mbadge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+  .m-uk { background:#003087; color:#fff; }
+  .m-us { background:#B22234; color:#fff; }
+  .m-de { background:#C8A800; color:#fff; }
+  .m-jp { background:#BC002D; color:#fff; }
+  .m-in { background:#D07020; color:#fff; }
+
+  .taglist { display: flex; flex-wrap: wrap; gap: 3px; }
+  .tag { padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 600; }
+  .tag-intel { background:#E8F4FD; color:#0071C5; }
+  .tag-amd   { background:#FDEAEA; color:#B22; }
+  .tag-apple { background:#F0F0F0; color:#333; }
+  .tag-qual  { background:#EEEEFF; color:#336; }
+  .tag-arm   { background:#FFF0E0; color:#944; }
+  .tag-other { background:#F5F5F5; color:#666; }
+
+  /* OVERVIEW FILTERS */
+  .ov-filters { background: #fff; border: 1px solid var(--bdr); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .ov-filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ov-filter-group label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); white-space: nowrap; min-width: 44px; }
+  .ov-btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+  .ov-btn { padding: 4px 11px; border-radius: 14px; border: 1px solid var(--bdr); background: #fff; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .ov-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .ov-btn.active { border-color: var(--pink); background: var(--pink-mid); color: var(--pink-dark); }
+  .ov-btn.ov-compl.active    { background: #D4EDDA; border-color: #27AE60; color: #155724; }
+  .ov-btn.ov-sched.active    { background: var(--pink-mid); border-color: var(--pink); color: var(--pink-dark); }
+  .ov-btn.ov-approv.active   { background: #E8EEF5; border-color: #4A6080; color: #4A6080; }
+  .ov-btn.ov-invited.active  { background: #DDE8F5; border-color: #2C5F8A; color: #2C5F8A; }
+  .ov-btn.ov-new.active      { background: #FEF3CD; border-color: #856404; color: #856404; }
+  .ov-btn.ov-prescreen.active{ background: #FFF0D9; border-color: #8A5A00; color: #8A5A00; }
+  .ov-btn.ov-backup.active   { background: #ECECEC; border-color: #666; color: #666; }
+  .ov-btn.ov-hold.active     { background: #E8E8E8; border-color: #555; color: #555; }
+  .ov-btn.ov-noshow.active   { background: #F8D7DA; border-color: #721C24; color: #721C24; }
+  .ov-count { margin-left: auto; font-size: 11px; color: var(--muted); font-style: italic; white-space: nowrap; }
+  .ov-empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 8px; border: 1px dashed var(--bdr); }
+
+  /* SCHEDULED TAB */
+  .sched-day { margin-bottom: 20px; }
+  .sched-day-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .sched-day-hdr h3 { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .sched-day-hdr .day-line { flex: 1; height: 1px; background: var(--bdr); }
+  .sched-day-hdr .day-count { font-size: 11px; color: var(--muted); }
+  .sched-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .sched-card { background: #fff; border: 1px solid var(--bdr); border-radius: 8px; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .sched-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .sched-card-name { font-weight: 700; font-size: 13px; }
+  .sched-time-block { text-align: right; }
+  .sched-time-local { font-size: 13px; font-weight: 700; color: var(--pink); }
+  .sched-time-et { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .sched-card-meta { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sched-meta-tag { font-size: 10px; background: var(--bg); border: 1px solid var(--bdr); border-radius: 4px; padding: 2px 7px; color: var(--txt); }
+  .sched-meta-tag.mkt { font-weight: 700; }
+  .sched-meta-tag.mod { font-weight: 700; border: none; }
+  .mod-Shilpa  { background:#E8F5E9; color:#2E7D32; }
+  .mod-Fran    { background:#EDE7F6; color:#512DA8; }
+  .mod-Joshua  { background:#E3F2FD; color:#1565C0; }
+  .mod-Kazu    { background:#FFF8E1; color:#F57F17; }
+  .mod-Elvin   { background:#FCE4EC; color:#C62828; }
+  .sched-card-quota { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 6px; border-top: 1px solid var(--bdr); }
+  .sched-q-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); align-self: center; margin-right: 2px; }
+  .sched-q-val { font-size: 10px; background: var(--pink-mid); color: var(--pink-dark); border-radius: 10px; padding: 1px 7px; font-weight: 600; }
+
+  .footer { text-align: center; padding: 14px; color: var(--muted); font-size: 10px; border-top: 1px solid var(--bdr); background: #fff; margin-top: 22px; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">
+    <div class="savanta-wordmark">
+      <span class="word">Savanta</span>
+      <div class="dots"><div class="dot"></div><div class="dot"></div></div>
+    </div>
+  </div>
+  <div class="hdr-title">
+    <h1>Recruitment Quota Tracker</h1>
+    <p>P050971 · AMD Website Usability Research (US &amp; EMEA) · IDIs</p>
+  </div>
+  <div class="hdr-meta">
+    <span id="ts">—</span>
+    <span>5 Markets · 21 Respondents · 1 Completed</span>
+  </div>
+</div>
+
+<div class="sumbar">
+  <div class="sstat"><span class="v" style="color:var(--pink)">36</span><span class="l">Total in Grid</span></div>
+  <div class="sstat"><span class="v" style="color:#27AE60">6</span><span class="l">Completed</span></div>
+  <div class="sstat"><span class="v" style="color:var(--pink)">11</span><span class="l">Scheduled</span></div>
+  <div class="sstat"><span class="v" style="color:#2C5F8A">5</span><span class="l">Approved / Invited</span></div>
+  <div class="sstat"><span class="v" style="color:#856404">7</span><span class="l">New</span></div>
+  <div class="sstat"><span class="v" style="color:#C27C00">2</span><span class="l">Prescreen</span></div>
+  <div class="sstat"><span class="v" style="color:#999">2</span><span class="l">Backup</span></div>
+  <div class="sstat"><span class="v" style="color:#AAAAAA">3</span><span class="l">On Hold</span></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview',this)">Overview <span class="cnt">5</span></div>
+  <div class="tab" onclick="showTab('all',this)">All Respondents <span class="cnt">36</span></div>
+  <div class="tab" onclick="showTab('uk',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="UK"> United Kingdom <span class="cnt">5</span></div>
+  <div class="tab" onclick="showTab('us',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:14px;vertical-align:middle;border-radius:2px;" alt="US"> United States <span class="cnt">6</span></div>
+  <div class="tab" onclick="showTab('de',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgogIDxyZWN0IHdpZHRoPSI1IiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KICA8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSIxIiB5PSIxIiBmaWxsPSIjRDAwIi8+CiAgPHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iMSIgeT0iMiIgZmlsbD0iI0ZGQ0UwMCIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="DE"> Germany <span class="cnt">6</span></div>
+  <div class="tab" onclick="showTab('jp',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan <span class="cnt">11</span></div>
+  <div class="tab" onclick="showTab('in',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India <span class="cnt">8</span></div>
+  <div class="tab" onclick="showTab('scheduled',this)">📅 Scheduled <span class="cnt">11</span></div>
+</div>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="ov-filters">
+    <div class="ov-filter-group">
+      <label>Country</label>
+      <div class="ov-btn-group" id="ov-country">
+        <button class="ov-btn active" data-val="" onclick="setOvFilter('country','',this)">All</button>
+        <button class="ov-btn" data-val="UK" onclick="setOvFilter('country','UK',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="UK"> United Kingdom</button>
+        <button class="ov-btn" data-val="US" onclick="setOvFilter('country','US',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:14px;vertical-align:middle;border-radius:2px;" alt="US"> United States</button>
+        <button class="ov-btn" data-val="DE" onclick="setOvFilter('country','DE',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgogIDxyZWN0IHdpZHRoPSI1IiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KICA8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSIxIiB5PSIxIiBmaWxsPSIjRDAwIi8+CiAgPHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iMSIgeT0iMiIgZmlsbD0iI0ZGQ0UwMCIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="DE"> Germany</button>
+        <button class="ov-btn" data-val="JP" onclick="setOvFilter('country','JP',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan</button>
+        <button class="ov-btn" data-val="IN" onclick="setOvFilter('country','IN',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India</button>
+      </div>
+    </div>
+    <div class="ov-filter-group">
+      <label>Status</label>
+      <div class="ov-btn-group" id="ov-status">
+        <button class="ov-btn active"      data-val=""                  onclick="setOvFilter('status','',this)">All</button>
+        <button class="ov-btn ov-compl"    data-val="Completed"          onclick="setOvFilter('status','Completed',this)">Completed</button>
+        <button class="ov-btn ov-sched"    data-val="Scheduled"          onclick="setOvFilter('status','Scheduled',this)">Scheduled</button>
+        <button class="ov-btn ov-invited"  data-val="Approved / Invited" onclick="setOvFilter('status','Approved / Invited',this)">Approved / Invited</button>
+        <button class="ov-btn ov-approv"   data-val="Approved"           onclick="setOvFilter('status','Approved',this)">Approved</button>
+        <button class="ov-btn ov-new"      data-val="New"                onclick="setOvFilter('status','New',this)">New</button>
+        <button class="ov-btn ov-prescreen"data-val="Prescreen"          onclick="setOvFilter('status','Prescreen',this)">Prescreen</button>
+        <button class="ov-btn ov-backup"   data-val="Backup"             onclick="setOvFilter('status','Backup',this)">Backup</button>
+        <button class="ov-btn ov-hold"     data-val="On Hold"            onclick="setOvFilter('status','On Hold',this)">On Hold</button>
+        <button class="ov-btn ov-noshow"   data-val="No Show"            onclick="setOvFilter('status','No Show',this)">No Show</button>
+        <button class="ov-btn ov-noshow"   data-val="Cancelled"          onclick="setOvFilter('status','Cancelled',this)">Cancelled</button>
+      </div>
+    </div>
+    <span class="ov-count" id="ov-count"></span>
+  </div>
+  <div class="mcards" id="mcard-container"></div>
+  <div class="ov-empty" id="ov-empty" style="display:none">No respondents match the selected filters.</div>
+</div>
+
+<!-- ALL RESPONDENTS -->
+<div class="panel" id="panel-all">
+  <div class="rt-wrap">
+    <div class="rt-toolbar"><h3>All Respondents (21)</h3><button class="btn" onclick="exportCSV('all')">⬇ Export CSV</button></div>
+    <div class="filters">
+      <label>Market:</label>
+      <select class="fsel" id="f-mkt" onchange="filterTable()">
+        <option value="">All</option>
+        <option value="UK"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="UK"> United Kingdom</option><option value="US"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:14px;vertical-align:middle;border-radius:2px;" alt="US"> United States</option>
+        <option value="DE"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgogIDxyZWN0IHdpZHRoPSI1IiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KICA8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSIxIiB5PSIxIiBmaWxsPSIjRDAwIi8+CiAgPHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iMSIgeT0iMiIgZmlsbD0iI0ZGQ0UwMCIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="DE"> Germany</option><option value="JP"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan</option><option value="IN"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India</option>
+      </select>
+      <label>Status:</label>
+      <select class="fsel" id="f-st" onchange="filterTable()">
+        <option value="">All</option>
+        <option value="Completed">Completed</option>
+        <option value="Scheduled">Scheduled</option>
+        <option value="Approved">Approved</option>
+        <option value="New">New</option>
+        <option value="On Hold">On Hold</option>
+        <option value="Approved / Invited">Approved / Invited</option>
+        <option value="Prescreen">Prescreen</option>
+        <option value="Backup">Backup</option>
+        <option value="No Show">No Show</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+      <label>Processor:</label>
+      <select class="fsel" id="f-proc" onchange="filterTable()">
+        <option value="">Any</option>
+        <option value="Intel">Intel</option><option value="AMD">AMD</option>
+        <option value="Apple">Apple</option><option value="Qualcomm">Qualcomm</option><option value="ARM">ARM-based</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="rt" id="main-table">
+      <thead><tr>
+        <th>Mkt</th><th>#</th><th>Name</th><th>Status</th><th>Appt</th>
+        <th>Industry (Q4)</th><th>Seniority (Q5)</th><th>Org Size (Q9)</th>
+        <th>Fortune/Listed (Q10)</th><th>Processors (Q13)</th><th>Research Resources (Q14)</th>
+      </tr></thead>
+      <tbody id="main-tbody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULED PANEL -->
+<div class="panel" id="panel-scheduled"><div id="mk-scheduled"></div></div>
+
+<!-- PER-MARKET PANELS -->
+<div class="panel" id="panel-uk"><div id="mk-uk"></div></div>
+<div class="panel" id="panel-us"><div id="mk-us"></div></div>
+<div class="panel" id="panel-de"><div id="mk-de"></div></div>
+<div class="panel" id="panel-jp"><div id="mk-jp"></div></div>
+<div class="panel" id="panel-in"><div id="mk-in"></div></div>
+
+</div><!-- /main -->
+<div class="footer">P050971 · AMD Website Usability Research · Savanta © 2026 · For internal project use only</div>
+
+<script>
+// ───────────────────────────────────────────────
+// DATA
+// ───────────────────────────────────────────────
+const R = [
+  // UK
+  {n:3,mkt:"UK",name:"Stuart",status:"Scheduled",appt:"3 Jun 2026",time:"12pm BST (7am ET)",sortKey:"2026-06-03T07:00",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Qualcomm","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Elvin"},
+  {n:2,mkt:"UK",name:"Eduardo",status:"Scheduled",appt:"3 Jun 2026",time:"2pm BST (9am ET)",sortKey:"2026-06-03T09:00",industry:"Consumer Products",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Computer brand website"],moderator:"Fran"},
+  {n:1,mkt:"UK",name:"Mark",status:"Approved / Invited",appt:"8/9/10 June TBC",time:"",sortKey:"",industry:"Manufacturing",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Samsung (Exynos)"],q14:["Online retailer","Computer brand website"],moderator:""},
+  {n:4,mkt:"UK",name:"Martin W",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Retail",seniority:"Director",orgSize:"1,000-4,999",fortune:"No",q13:["Intel"],q14:["Online retailer","Physical store"],moderator:""},
+  {n:5,mkt:"UK",name:"David",status:"New",appt:"5 Jun / 7 Jun 2026",time:"",sortKey:"",industry:"Technology",seniority:"Executive / Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website"],moderator:""},
+  // US
+  {n:1,mkt:"US",name:"Rahul P",status:"Completed",appt:"29 May 2026",time:"14:30 ET",sortKey:"2026-05-29T14:30",industry:"Banking, and Other Financial Services",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Online retailer","Computer brand website"],moderator:"Fran"},
+  {n:2,mkt:"US",name:"Aditya M",status:"Approved / Invited",appt:"1 Jun / 4 Jun 2026",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm","Samsung (Exynos)","ARM-based (other)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  {n:3,mkt:"US",name:"Ahmad K",status:"Approved / Invited",appt:"2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Healthcare",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  {n:4,mkt:"US",name:"Jason S",status:"New",appt:"",time:"",sortKey:"",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  {n:5,mkt:"US",name:"Joe B",status:"On Hold",appt:"1 Jun / 2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Healthcare",seniority:"Executive / Senior Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD","Apple (M-series)","Qualcomm"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website","Second-hand/refurbished","Other"],moderator:""},
+  {n:6,mkt:"US",name:"Andrew F",status:"New",appt:"2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Education & Non-Profit",seniority:"Director",orgSize:"50-99",fortune:"No",q13:["Intel","Qualcomm"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  // DE
+  {n:1,mkt:"DE",name:"Mohamed",status:"Completed",appt:"1 Jun 2026",time:"16:45 CEST (10:45am ET)",sortKey:"2026-06-01T10:45",industry:"Transportation, Distribution and Logistics",seniority:"Manager / Team Leader",orgSize:"500-999",fortune:"Fortune 1000",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Computer brand website"],moderator:"Joshua"},
+  {n:2,mkt:"DE",name:"Gregor",status:"Scheduled",appt:"9 Jun 2026",time:"11:00 CEST (5am ET)",sortKey:"2026-06-09T05:00",industry:"Technology",seniority:"Manager / Team Leader",orgSize:"500-999",fortune:"No",q13:["Intel","AMD","Qualcomm"],q14:["Online retailer","Computer brand website"],moderator:"Joshua"},
+  {n:3,mkt:"DE",name:"Michael",status:"Scheduled",appt:"9 Jun 2026",time:"15:30 CEST (9:30am ET)",sortKey:"2026-06-09T09:30",industry:"Healthcare",seniority:"Director",orgSize:"500-999",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website"],moderator:"Joshua"},
+  {n:4,mkt:"DE",name:"Rüdiger",status:"Scheduled",appt:"9 Jun 2026",time:"17:00 CEST (11am ET)",sortKey:"2026-06-09T11:00",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:"Joshua"},
+  {n:5,mkt:"DE",name:"Andreas",status:"Scheduled",appt:"11 Jun 2026",time:"17:00 CEST (11am ET)",sortKey:"2026-06-11T11:00",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD"],q14:["Online retailer","Computer brand website"],moderator:"Joshua"},
+  {n:6,mkt:"DE",name:"Ralf",status:"Scheduled",appt:"12 Jun 2026",time:"11:00 CEST (5am ET)",sortKey:"2026-06-12T05:00",industry:"Energy & Utilities",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)"],q14:["Computer brand website"],moderator:"Joshua"},
+  // JP
+  {n:1,mkt:"JP",name:"ID1320",status:"Scheduled",appt:"3 Jun 2026",time:"19:00 JST (6am ET)",sortKey:"2026-06-03T06:00",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
+  {n:2,mkt:"JP",name:"ID1832",status:"Scheduled",appt:"3 Jun 2026",time:"20:30 JST (7:30am ET)",sortKey:"2026-06-03T07:30",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:3,mkt:"JP",name:"ID2146",status:"Approved / Invited",appt:"",time:"",sortKey:"",industry:"Healthcare",seniority:"Director",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
+  {n:4,mkt:"JP",name:"ID4988",status:"Prescreen",appt:"",time:"",sortKey:"",industry:"Telecom",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD","Apple (M-series)","MediaTek","ARM-based (other)"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:5,mkt:"JP",name:"ID128",status:"Prescreen",appt:"",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Executive / Senior Leader",orgSize:"100-249",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
+  {n:6,mkt:"JP",name:"ID1055",status:"Approved / Invited",appt:"",time:"",sortKey:"",industry:"Technology",seniority:"Executive / Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:"Kazu"},
+  {n:7,mkt:"JP",name:"ID2094",status:"Backup",appt:"",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"500-999",fortune:"No",q13:["Intel","AMD"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:8,mkt:"JP",name:"ID692",status:"Backup",appt:"",time:"",sortKey:"",industry:"Other",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
+  {n:9,mkt:"JP",name:"ID1229",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Insurance",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website","Other"],moderator:"Kazu"},
+  {n:10,mkt:"JP",name:"ID1899",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
+  {n:11,mkt:"JP",name:"ID3265",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
+  // IN
+  {n:3,mkt:"IN",name:"Lalit M",status:"Completed",appt:"28 May 2026",time:"6:00pm IST (8:30am ET)",sortKey:"2026-05-28T08:30",industry:"Manufacturing",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:5,mkt:"IN",name:"Suhana S",status:"Completed",appt:"29 May 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-05-29T07:30",industry:"Other",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:8,mkt:"IN",name:"Ganesh K",status:"Completed",appt:"1 Jun 2026",time:"7:00pm IST (9:30am ET)",sortKey:"2026-06-01T09:30",industry:"Other",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
+  {n:4,mkt:"IN",name:"Deepak P",status:"Completed",appt:"1 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-01T11:00",industry:"Retail",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Computer brand website"],moderator:"Shilpa"},
+  {n:7,mkt:"IN",name:"Hari Raghavan",status:"Scheduled",appt:"2 Jun 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-06-02T07:30",industry:"Telecom",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:6,mkt:"IN",name:"Jogendra B",status:"Scheduled",appt:"2 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-02T11:00",industry:"Other",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
+  {n:1,mkt:"IN",name:"Ketan",status:"On Hold",appt:"",time:"",sortKey:"",industry:"Telecom",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)","ARM-based (other)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:9,mkt:"IN",name:"Mohan Raj",status:"On Hold",appt:"",time:"",sortKey:"",industry:"Technology",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+];
+
+const MKT_NAMES = {UK:"United Kingdom",US:"United States",DE:"Germany",JP:"Japan",IN:"India"};
+const MKT_FLAGS = {UK:`<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:13px;vertical-align:middle;border-radius:2px;" alt="UK">`,US:`<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:13px;vertical-align:middle;border-radius:2px;" alt="US">`,DE:`<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgogIDxyZWN0IHdpZHRoPSI1IiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KICA8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSIxIiB5PSIxIiBmaWxsPSIjRDAwIi8+CiAgPHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iMSIgeT0iMiIgZmlsbD0iI0ZGQ0UwMCIvPgo8L3N2Zz4=" style="height:13px;vertical-align:middle;border-radius:2px;" alt="DE">`,JP:`<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:13px;vertical-align:middle;border-radius:2px;" alt="JP">`,IN:`<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:13px;vertical-align:middle;border-radius:2px;" alt="IN">`};
+
+// ───────────────────────────────────────────────
+// PILL / BADGE HELPERS
+// ───────────────────────────────────────────────
+function pill(status) {
+  const map = {
+    "New":"p-new","Scheduled":"p-sched","Approved":"p-approved","Approved / Invited":"p-invited",
+    "On Hold":"p-hold","No Show":"p-noshow","Cancelled":"p-noshow","Completed":"p-compl","Pipeline":"p-pipe",
+    "Prescreen":"p-prescreen","Backup":"p-backup"
+  };
+  return `<span class="pill ${map[status]||'p-hold'}">${status}</span>`;
+}
+function badge(m) {
+  return `<span class="mbadge m-${m.toLowerCase()}">${MKT_FLAGS[m]} ${MKT_NAMES[m]}</span>`;
+}
+function procTags(list) {
+  const cls = {Intel:'tag-intel',AMD:'tag-amd','Apple (M-series)':'tag-apple',Qualcomm:'tag-qual','ARM-based (other)':'tag-arm'};
+  return `<div class="taglist">${list.map(p=>`<span class="tag ${cls[p]||'tag-other'}">${p}</span>`).join('')}</div>`;
+}
+function q14Tags(list) {
+  const short = {
+    "Processor mfr website":"Mfr website",
+    "Online retailer":"Online retailer",
+    "Physical store":"Physical store",
+    "Computer brand website":"Brand website",
+    "2nd-hand/refurbished marketplace":"2nd-hand",
+    "Other":"Other","Dont know":"Don't know"
+  };
+  return `<div class="taglist">${list.map(p=>`<span class="tag tag-other">${short[p]||p}</span>`).join('')}</div>`;
+}
+
+// ───────────────────────────────────────────────
+// QUOTA BREAKDOWN HELPER
+// ───────────────────────────────────────────────
+// ───────────────────────────────────────────────
+// PLANNED QUOTA TARGETS
+// ───────────────────────────────────────────────
+// Actuals are counted against Completed + Scheduled respondents only.
+// Min = minimum required. Max = hard cap. null = no specific target for that cell.
+const TARGETS = {
+  overall: {US:10, UK:6, DE:6, JP:6, IN:6},
+  q4: {
+    // US: min 1 per listed industry. EMEA: min 4 total across industries (cap 1 per industry).
+    US: {'Banking, and Other Financial Services':{min:1},'Healthcare':{min:1},'Transportation, Distribution and Logistics':{min:1},'Telecom':{min:1},'Manufacturing':{min:1},'Retail':{min:1}},
+    UK: {_totalMin:4}, DE: {_totalMin:4}, JP: {_totalMin:4}, IN: {_totalMin:4}
+  },
+  q5: {
+    // Directors, Managers (core evaluators), Hands-on technical. Executive treated as Director tier.
+    US: {'Director':{min:2},'Executive / Senior Leader':{min:2},'Manager / Team Leader':{min:2},'Associate / Specialist / Engineer / Administrator':{min:2}},
+    UK: {'Director':{min:1},'Executive / Senior Leader':{min:1},'Manager / Team Leader':{min:1},'Associate / Specialist / Engineer / Administrator':{min:1}},
+    DE: {'Director':{min:1},'Executive / Senior Leader':{min:1},'Manager / Team Leader':{min:1},'Associate / Specialist / Engineer / Administrator':{min:1}},
+    JP: {'Director':{min:1},'Executive / Senior Leader':{min:1},'Manager / Team Leader':{min:1},'Associate / Specialist / Engineer / Administrator':{min:1}},
+    IN: {'Director':{min:1},'Executive / Senior Leader':{min:1},'Manager / Team Leader':{min:1},'Associate / Specialist / Engineer / Administrator':{min:1}}
+  },
+  q9: {
+    // US: min 1 per bracket. EMEA: max 2 per bracket.
+    US: {'100-249':{min:1},'250-499':{min:1},'500-999':{min:1},'1,000-4,999':{min:1},'5,000+':{min:1}},
+    UK: {_maxPerBracket:2}, DE: {_maxPerBracket:2}, JP: {_maxPerBracket:2}, IN: {_maxPerBracket:2}
+  },
+  q10: {
+    // US: 5 total, min 3 Fortune 1000, max 5 non-Fortune. EMEA: 3 total, min 2 Fortune 1000, max 3 non-Fortune.
+    US: {'Fortune 1000':{min:3},'Fortune 2000 / equivalent':{min:0},'No':{max:5}},
+    UK: {'Fortune 1000':{min:2},'Fortune 2000 / equivalent':{min:0},'No':{max:3}},
+    DE: {'Fortune 1000':{min:2},'Fortune 2000 / equivalent':{min:0},'No':{max:3}},
+    JP: {'Nikkei 225':{min:2},'No':{max:3}},
+    IN: {'Fortune 1000':{min:2},'Fortune 2000 / equivalent':{min:0},'No':{max:3}}
+  },
+  q13: {
+    // AMD is the key quota: min 3 per market
+    US: {'AMD':{min:3}}, UK: {'AMD':{min:3}}, DE: {'AMD':{min:3}}, JP: {'AMD':{min:3}}, IN: {'AMD':{min:3}}
+  },
+  q14: {
+    // Processor mfr website and online retailer both need min target
+    US: {'Processor mfr website':{min:5},'Online retailer':{min:5}},
+    UK: {'Processor mfr website':{min:3},'Online retailer':{min:3}},
+    DE: {'Processor mfr website':{min:3},'Online retailer':{min:3}},
+    JP: {'Processor mfr website':{min:3},'Online retailer':{min:3}},
+    IN: {'Processor mfr website':{min:3},'Online retailer':{min:3}}
+  }
+};
+
+// Rows that count toward quota (Completed + Scheduled)
+function confirmedRows(rows) {
+  return rows.filter(r => r.status === 'Completed' || r.status === 'Scheduled');
+}
+
+function countBy(rows, fn) {
+  const map = {};
+  rows.forEach(r => {
+    const k = fn(r);
+    if (Array.isArray(k)) k.forEach(v => { map[v] = (map[v]||0)+1; });
+    else if (k) map[k] = (map[k]||0)+1;
+  });
+  return map;
+}
+
+function quotaTable(allCounts, confirmedCounts, maxN, targets, colorClass) {
+  // allCounts = from all visible rows (for bar scale)
+  // confirmedCounts = from Completed+Scheduled only (for quota checking)
+  // targets = {label: {min, max}} or null
+  const keys = Object.keys(allCounts).sort((a,b)=>allCounts[b]-allCounts[a]);
+  return `<table class="qt">${keys.map(k => {
+    const all = allCounts[k] || 0;
+    const conf = confirmedCounts[k] || 0;
+    const tgt = targets ? targets[k] : null;
+    let tgtCell = '';
+    if (tgt) {
+      if (tgt.min !== undefined && tgt.min > 0) {
+        const met = conf >= tgt.min;
+        const close = !met && conf >= tgt.min - 1;
+        const cls = met ? 'qt-met' : close ? 'qt-close' : 'qt-gap';
+        tgtCell = `<td class="qt-tgt ${cls}">${conf}/${tgt.min}</td>`;
+      } else if (tgt.max !== undefined) {
+        const over = conf > tgt.max;
+        tgtCell = `<td class="qt-tgt ${over?'qt-over':''}">${conf}≤${tgt.max}</td>`;
+      }
+    } else if (targets) {
+      // key exists in confirmed but not in targets — show count only, no target
+      tgtCell = `<td class="qt-tgt qt-notgt">${conf}</td>`;
+    }
+    return `<tr>
+      <td>${k}</td>
+      <td class="num">${all}</td>
+      ${tgtCell}
+      <td class="bar"><div class="minibar ${colorClass||''}" style="width:${Math.round(all/maxN*100)}%"></div></td>
+    </tr>`;
+  }).join('')}</table>`;
+}
+
+function accordion(title, content, openByDefault) {
+  const id = Math.random().toString(36).slice(2);
+  return `
+    <div class="qa">
+      <div class="qa-hdr ${openByDefault?'open':''}" onclick="toggleQA(this,'qab-${id}')">
+        <span>${title}</span><span class="arr">▼</span>
+      </div>
+      <div class="qa-body ${openByDefault?'open':''}" id="qab-${id}">${content}</div>
+    </div>`;
+}
+
+function toggleQA(hdr, bodyId) {
+  hdr.classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
+}
+
+// ───────────────────────────────────────────────
+// STATUS BAR
+// ───────────────────────────────────────────────
+function statusBar(rows) {
+  const n = rows.length;
+  const counts = countBy(rows, r=>r.status);
+  const segs = [
+    ['Completed','s-compl','p-compl'],
+    ['Scheduled','s-sched','p-sched'],
+    ['Approved','s-approv','p-approved'],
+    ['Approved / Invited','s-invited','p-invited'],
+    ['New','s-new','p-new'],
+    ['Prescreen','s-prescreen','p-prescreen'],
+    ['Backup','s-backup','p-backup'],
+    ['On Hold','s-hold','p-hold'],
+    ['No Show','s-noshow','p-noshow'],
+    ['Cancelled','s-noshow','p-noshow'],
+  ];
+  const bars = segs.map(([s,sc]) => counts[s]
+    ? `<div class="${sc}" style="width:${counts[s]/n*100}%"></div>` : '').join('');
+  const ps = segs.map(([s,sc,pc]) => counts[s]
+    ? `<span class="pill ${pc}">${s} ${counts[s]}</span>` : '').join('');
+  return `
+    <div class="sbar-wrap">
+      <div class="sbar-lbl"><span>Status breakdown</span><span>${n} total</span></div>
+      <div class="sbar">${bars}</div>
+    </div>
+    <div class="pills">${ps}</div>`;
+}
+
+// ───────────────────────────────────────────────
+// BUILD MARKET CARD
+// ───────────────────────────────────────────────
+function quotaStatusBadges(mkt, conf) {
+  // Show key quota headline badges in the card header
+  const tgt = TARGETS.overall[mkt];
+  const badges = [];
+  // Overall sample
+  if (tgt) {
+    const cls = conf >= tgt ? 'qt-met' : conf >= tgt-1 ? 'qt-close' : 'qt-gap';
+    badges.push(`<span class="qt-badge ${cls}">${conf}/${tgt} overall</span>`);
+  }
+  // AMD quota
+  const amdTgt = TARGETS.q13[mkt]?.AMD?.min;
+  if (amdTgt) {
+    const amdConf = R.filter(r=>r.mkt===mkt && (r.status==='Completed'||r.status==='Scheduled') && r.q13.includes('AMD')).length;
+    const cls = amdConf >= amdTgt ? 'qt-met' : amdConf >= amdTgt-1 ? 'qt-close' : 'qt-gap';
+    badges.push(`<span class="qt-badge ${cls}">AMD ${amdConf}/${amdTgt}</span>`);
+  }
+  return badges.length ? `<div class="qt-badges">${badges.join('')}</div>` : '';
+}
+
+function buildCard(mkt, filteredRows) {
+  const rows = filteredRows !== undefined ? filteredRows : R.filter(r=>r.mkt===mkt);
+  const conf = confirmedRows(rows);
+  const n = rows.length;
+  const nc = conf.length;
+  const q4  = quotaTable(countBy(rows,r=>r.industry), countBy(conf,r=>r.industry), n, TARGETS.q4[mkt]||null);
+  const q5  = quotaTable(countBy(rows,r=>r.seniority), countBy(conf,r=>r.seniority), n, TARGETS.q5[mkt]||null);
+  const q9  = quotaTable(countBy(rows,r=>r.orgSize),   countBy(conf,r=>r.orgSize),   n, TARGETS.q9[mkt]||null);
+  const q10 = quotaTable(countBy(rows,r=>r.fortune),   countBy(conf,r=>r.fortune),   n, TARGETS.q10[mkt]||null);
+  const q13 = quotaTable(countBy(rows,r=>r.q13),       countBy(conf,r=>r.q13),       n, TARGETS.q13[mkt]||null, '');
+  const q14 = quotaTable(countBy(rows,r=>r.q14),       countBy(conf,r=>r.q14),       n, TARGETS.q14[mkt]||null);
+  const badges = quotaStatusBadges(mkt, nc);
+  return `
+    <div class="mcard">
+      <div class="mcard-hdr">
+        <h3>${MKT_FLAGS[mkt]} ${MKT_NAMES[mkt]}</h3>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          ${badges}
+          <span style="font-size:11px;opacity:.75">${n} in grid · ${nc} confirmed</span>
+        </div>
+      </div>
+      <div class="mcard-body">
+        ${statusBar(rows)}
+        <div class="qt-legend">Confirmed (Completed + Scheduled): <b>${nc}</b> / Target: <b>${TARGETS.overall[mkt]||'–'}</b></div>
+        ${accordion('Q4 · Industry', q4, true)}
+        ${accordion('Q5 · Seniority', q5, true)}
+        ${accordion('Q9 · Org Size', q9, false)}
+        ${accordion('Q10 · Fortune / Listed', q10, false)}
+        ${accordion('Q13 · Processor Brands in Org', q13, false)}
+        ${accordion('Q14 · PC Research Resources', q14, false)}
+      </div>
+    </div>`;
+}
+
+// Aggregate TARGETS across a list of markets, summing min values for each label
+function aggregateTargets(dim, mkts) {
+  const result = {};
+  mkts.forEach(m => {
+    const t = TARGETS[dim][m];
+    if (!t) return;
+    Object.entries(t).forEach(([k, v]) => {
+      if (k.startsWith('_')) return; // skip meta keys like _totalMin
+      if (!result[k]) result[k] = {};
+      if (v.min !== undefined) result[k].min = (result[k].min||0) + v.min;
+      if (v.max !== undefined) result[k].max = (result[k].max||0) + v.max;
+    });
+  });
+  return Object.keys(result).length ? result : null;
+}
+
+function buildAllCountriesCard(rows) {
+  const n = rows.length;
+  const conf = confirmedRows(rows);
+  const nc = conf.length;
+  const mktsInRows = [...new Set(rows.map(r=>r.mkt))];
+  const totalTarget = mktsInRows.reduce((s,m)=>s+(TARGETS.overall[m]||0),0);
+  const agg = dim => aggregateTargets(dim, mktsInRows);
+
+  const q4  = quotaTable(countBy(rows,r=>r.industry), countBy(conf,r=>r.industry), n, agg('q4'));
+  const q5  = quotaTable(countBy(rows,r=>r.seniority), countBy(conf,r=>r.seniority), n, agg('q5'));
+  const q9  = quotaTable(countBy(rows,r=>r.orgSize),   countBy(conf,r=>r.orgSize),   n, agg('q9'));
+  const q10 = quotaTable(countBy(rows,r=>r.fortune),   countBy(conf,r=>r.fortune),   n, agg('q10'));
+  const q13 = quotaTable(countBy(rows,r=>r.q13),       countBy(conf,r=>r.q13),       n, agg('q13'), '');
+  const q14 = quotaTable(countBy(rows,r=>r.q14),       countBy(conf,r=>r.q14),       n, agg('q14'));
+
+  // AMD badge for all-countries
+  const amdMin = mktsInRows.reduce((s,m)=>(s+(TARGETS.q13[m]?.AMD?.min||0)),0);
+  const amdConf = conf.filter(r=>r.q13.includes('AMD')).length;
+  const amdCls = amdConf>=amdMin?'qt-met':amdConf>=amdMin-2?'qt-close':'qt-gap';
+  const overallCls = nc>=totalTarget?'qt-met':nc>=totalTarget-3?'qt-close':'qt-gap';
+
+  return `
+    <div class="mcard mcard-all">
+      <div class="mcard-hdr">
+        <h3><span style="font-size:14px;letter-spacing:.03em;font-weight:700">🌍 All Countries</span></h3>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          <span class="qt-badge ${overallCls}">${nc}/${totalTarget} overall</span>
+          <span class="qt-badge ${amdCls}">AMD ${amdConf}/${amdMin}</span>
+          <span style="font-size:11px;opacity:.75">${n} in grid · ${mktsInRows.length} markets</span>
+        </div>
+      </div>
+      <div class="mcard-body">
+        ${statusBar(rows)}
+        <div class="qt-legend">Confirmed (Completed + Scheduled): <b>${nc}</b> / Total target: <b>${totalTarget}</b> &nbsp;·&nbsp; Targets shown are sums across all visible markets</div>
+        ${accordion('Q4 · Industry', q4, true)}
+        ${accordion('Q5 · Seniority', q5, true)}
+        ${accordion('Q9 · Org Size', q9, false)}
+        ${accordion('Q10 · Fortune / Listed', q10, false)}
+        ${accordion('Q13 · Processor Brands in Org', q13, false)}
+        ${accordion('Q14 · PC Research Resources', q14, false)}
+      </div>
+    </div>`;
+}
+
+// ───────────────────────────────────────────────
+// SCHEDULED PANEL
+// ───────────────────────────────────────────────
+function buildScheduledPanel() {
+  const rows = R
+    .filter(r => r.status === 'Scheduled' && r.sortKey)
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+  // Group by date (YYYY-MM-DD)
+  const byDate = {};
+  rows.forEach(r => {
+    const d = r.sortKey.split('T')[0];
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(r);
+  });
+
+  const fmtDate = iso => {
+    const [y,m,d] = iso.split('-');
+    const dt = new Date(+y, +m-1, +d);
+    return dt.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  };
+
+  const splitTime = t => {
+    // "16:45 CEST (10:45am ET)" → local="16:45 CEST", et="10:45am ET"
+    // "14:30 ET" → local="14:30 ET", et=""
+    const m = t.match(/^(.+?)\s*\((.+?)\)\s*$/);
+    return m ? {local: m[1].trim(), et: m[2].trim()} : {local: t, et: ''};
+  };
+
+  let html = `
+    <div class="rt-wrap">
+      <div class="rt-toolbar">
+        <h3>📅 Scheduled / Rescheduled &nbsp;<span style="font-weight:400;color:var(--muted);font-size:12px">${rows.length} session${rows.length!==1?'s':''} · sorted chronologically by ET</span></h3>
+        <button class="btn" onclick="exportScheduled()">⬇ Export CSV</button>
+      </div>
+      <div style="padding:14px 16px;">`;
+
+  Object.keys(byDate).sort().forEach(date => {
+    const dayRows = byDate[date];
+    html += `
+      <div class="sched-day">
+        <div class="sched-day-hdr">
+          <h3>${fmtDate(date)}</h3>
+          <div class="day-line"></div>
+          <span class="day-count">${dayRows.length} session${dayRows.length!==1?'s':''}</span>
+        </div>
+        <div class="sched-cards">`;
+
+    dayRows.forEach(r => {
+      const {local, et} = splitTime(r.time);
+      html += `
+          <div class="sched-card">
+            <div class="sched-card-top">
+              <div>
+                <div class="sched-card-name">${r.name}</div>
+                ${r.moderator ? `<div style="margin-top:3px"><span class="sched-meta-tag mod mod-${r.moderator}">🎙 ${r.moderator}</span></div>` : ''}
+              </div>
+              <div class="sched-time-block">
+                <div class="sched-time-local">${local}</div>
+                ${et ? `<div class="sched-time-et">${et}</div>` : ''}
+              </div>
+            </div>
+            <div class="sched-card-meta">
+              <span class="sched-meta-tag mkt">${MKT_FLAGS[r.mkt]} ${MKT_NAMES[r.mkt]}</span>
+              <span class="sched-meta-tag">${r.seniority}</span>
+              <span class="sched-meta-tag">${r.industry}</span>
+            </div>
+            <div class="sched-card-quota">
+              <span class="sched-q-lbl">Org</span><span class="sched-q-val">${r.orgSize}</span>
+              <span class="sched-q-lbl" style="margin-left:4px">Processors</span>
+              ${r.q13.map(p=>`<span class="sched-q-val" style="${p==='AMD'?'background:#FDE8E8;color:#C22':p==='Intel'?'background:#E8F4FD;color:#0071C5':''}">${p}</span>`).join('')}
+            </div>
+          </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  html += `</div></div>`;
+  return html;
+}
+
+function exportScheduled() {
+  const rows = R
+    .filter(r => r.status === 'Scheduled' && r.sortKey)
+    .sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  const hdr = ['Market','Name','Appt Date','Local Time','ET Time','Seniority','Industry','Org Size','Fortune (Q10)','Processors (Q13)','Research Resources (Q14)'];
+  const data = rows.map(r => {
+    const {local, et} = (() => {
+      const m = r.time.match(/^(.+?)\s*\((.+?)\)\s*$/);
+      return m ? {local:m[1].trim(),et:m[2].trim()} : {local:r.time,et:''};
+    })();
+    return [MKT_NAMES[r.mkt],r.name,r.appt,local,et,r.seniority,r.industry,r.orgSize,r.fortune,r.q13.join('; '),r.q14.join('; ')];
+  });
+  const csv = [hdr,...data].map(row=>row.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'P050971_Scheduled_Sessions.csv';
+  a.click();
+}
+
+// ───────────────────────────────────────────────
+// BUILD RESPONDENT TABLE ROW
+// ───────────────────────────────────────────────
+function buildRow(r, showMkt) {
+  return `<tr data-mkt="${r.mkt}" data-status="${r.status}" data-proc="${r.q13.join('|')}">
+    ${showMkt ? `<td>${badge(r.mkt)}</td>` : '<td></td>'}
+    <td>${r.n}</td>
+    <td class="nm">${r.name}</td>
+    <td>${pill(r.status)}</td>
+    <td style="white-space:nowrap">${r.appt}${r.time?'<br><span style="color:var(--muted)">'+r.time+'</span>':''}</td>
+    <td>${r.industry}</td>
+    <td>${r.seniority}</td>
+    <td>${r.orgSize}</td>
+    <td>${r.fortune}</td>
+    <td>${procTags(r.q13)}</td>
+    <td>${q14Tags(r.q14)}</td>
+  </tr>`;
+}
+
+function buildMarketPanel(mkt) {
+  const rows = R.filter(r=>r.mkt===mkt);
+  return `
+    <div class="rt-wrap">
+      <div class="rt-toolbar">
+        <h3>${MKT_FLAGS[mkt]} ${MKT_NAMES[mkt]} (${rows.length})</h3>
+        <button class="btn" onclick="exportCSV('${mkt}')">⬇ Export CSV</button>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="rt">
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Status</th><th>Appt</th>
+          <th>Industry (Q4)</th><th>Seniority (Q5)</th><th>Org Size (Q9)</th>
+          <th>Fortune (Q10)</th><th>Processors (Q13)</th><th>Research Resources (Q14)</th>
+        </tr></thead>
+        <tbody>${rows.map(r=>`<tr>
+          <td>${r.n}</td><td class="nm">${r.name}</td>
+          <td>${pill(r.status)}</td>
+          <td style="white-space:nowrap">${r.appt}${r.time?'<br><span style="color:var(--muted)">'+r.time+'</span>':''}</td>
+          <td>${r.industry}</td><td>${r.seniority}</td><td>${r.orgSize}</td>
+          <td>${r.fortune}</td>
+          <td>${procTags(r.q13)}</td><td>${q14Tags(r.q14)}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      </div>
+    </div>`;
+}
+
+// ───────────────────────────────────────────────
+// OVERVIEW FILTER STATE
+// ───────────────────────────────────────────────
+const OV = { country: new Set(), status: new Set() };
+
+function setOvFilter(dim, val, el) {
+  const sel = OV[dim];
+  if (val === '') {
+    // "All" clears the set
+    sel.clear();
+  } else {
+    // Toggle value; if now empty treat as "All"
+    if (sel.has(val)) sel.delete(val); else sel.add(val);
+  }
+  // Sync button states
+  const group = el.closest('.ov-btn-group');
+  group.querySelectorAll('.ov-btn').forEach(b => {
+    const bval = b.dataset.val;
+    if (bval === '') {
+      b.classList.toggle('active', sel.size === 0);
+    } else {
+      b.classList.toggle('active', sel.has(bval));
+    }
+  });
+  renderOverview();
+}
+
+function renderOverview() {
+  const mkts = ['UK','US','DE','JP','IN'];
+  const container = document.getElementById('mcard-container');
+  const empty = document.getElementById('ov-empty');
+  const countEl = document.getElementById('ov-count');
+
+  const cFilter = OV.country;
+  const sFilter = OV.status;
+  const visibleMkts = cFilter.size ? mkts.filter(m => cFilter.has(m)) : mkts;
+
+  let cards = '';
+  let totalShown = 0;
+  let allRows = [];
+
+  visibleMkts.forEach(mkt => {
+    let rows = R.filter(r => r.mkt === mkt);
+    if (sFilter.size) rows = rows.filter(r => sFilter.has(r.status));
+    if (rows.length === 0) return;
+    totalShown += rows.length;
+    allRows = allRows.concat(rows);
+    cards += buildCard(mkt, rows);
+  });
+
+  // Prepend "All Countries" combined card when more than one market is visible
+  const combined = allRows.length > 0 && visibleMkts.length > 1
+    ? buildAllCountriesCard(allRows) : '';
+  container.innerHTML = combined + cards;
+  const isFiltered = cFilter.size || sFilter.size;
+  countEl.textContent = isFiltered
+    ? `Showing ${totalShown} respondent${totalShown !== 1 ? 's' : ''}` : '';
+  empty.style.display = totalShown === 0 ? 'block' : 'none';
+  container.style.display = totalShown === 0 ? 'none' : '';
+}
+
+// ───────────────────────────────────────────────
+// FILTER (ALL RESPONDENTS TAB)
+// ───────────────────────────────────────────────
+function filterTable() {
+  const mkt  = document.getElementById('f-mkt').value;
+  const st   = document.getElementById('f-st').value;
+  const proc = document.getElementById('f-proc').value;
+  document.querySelectorAll('#main-tbody tr').forEach(tr => {
+    const mOk = !mkt || tr.dataset.mkt === mkt;
+    const sOk = !st  || tr.dataset.status === st;
+    const pOk = !proc || tr.dataset.proc.includes(proc);
+    tr.style.display = (mOk && sOk && pOk) ? '' : 'none';
+  });
+}
+
+// ───────────────────────────────────────────────
+// EXPORT
+// ───────────────────────────────────────────────
+function exportCSV(mkt) {
+  const rows = mkt === 'all' ? R : R.filter(r => r.mkt === mkt);
+  const hdr = ['Market','#','Name','Status','Appt Date','Appt Time','Industry (Q4)','Seniority (Q5)','Org Size (Q9)','Fortune/Listed (Q10)','Processor Brands (Q13)','Research Resources (Q14)'];
+  const data = rows.map(r => [MKT_NAMES[r.mkt], r.n, r.name, r.status, r.appt, r.time, r.industry, r.seniority, r.orgSize, r.fortune, r.q13.join('; '), r.q14.join('; ')]);
+  const csv = [hdr, ...data].map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `P050971_Quotas_${mkt==='all'?'All':MKT_NAMES[mkt].replace(/ /g,'_')}.csv`;
+  a.click();
+}
+
+// ───────────────────────────────────────────────
+// TAB
+// ───────────────────────────────────────────────
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ───────────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────────
+function init() {
+  // Overview cards
+  renderOverview();
+
+  // All respondents table
+  document.getElementById('main-tbody').innerHTML =
+    R.map(r => buildRow(r, true)).join('');
+
+  // Scheduled panel
+  document.getElementById('mk-scheduled').innerHTML = buildScheduledPanel();
+
+  // Per-market panels
+  ['UK','US','DE','JP','IN'].forEach(m => {
+    document.getElementById('mk-'+m.toLowerCase()).innerHTML = buildMarketPanel(m);
+  });
+
+  // Timestamp
+  document.getElementById('ts').textContent =
+    'Loaded: ' + new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+init();
+</script>
+</body>
+</html>
