@@ -234,6 +234,22 @@
   <div class="sstat"><span class="v" style="color:#AAAAAA">3</span><span class="l">On Hold</span></div>
 </div>
 
+<!-- EDIT TARGETS MODAL -->
+<div id="tgt-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;overflow-y:auto;" onclick="if(event.target===this)closeTgtModal()">
+  <div style="background:#fff;border-radius:10px;max-width:780px;margin:40px auto;padding:28px 28px 20px;position:relative;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <h2 style="font-size:16px;font-weight:700;color:var(--dark);margin:0">✏️ Edit Quota Targets</h2>
+      <button onclick="closeTgtModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin:0 0 16px">Changes apply immediately and are remembered for this browser session. Targets are checked against <b>Completed + Scheduled</b> respondents only.</p>
+    <div id="tgt-editor-body"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:14px;border-top:1px solid var(--bdr)">
+      <button class="btn" onclick="resetTargets()">↩ Reset to defaults</button>
+      <button class="btn" style="background:var(--pink);color:#fff;border-color:var(--pink);" onclick="closeTgtModal()">Done</button>
+    </div>
+  </div>
+</div>
+
 <div class="tabs">
   <div class="tab active" onclick="showTab('overview',this)">Overview <span class="cnt">5</span></div>
   <div class="tab" onclick="showTab('all',this)">All Respondents <span class="cnt">36</span></div>
@@ -243,6 +259,9 @@
   <div class="tab" onclick="showTab('jp',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan <span class="cnt">11</span></div>
   <div class="tab" onclick="showTab('in',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India <span class="cnt">8</span></div>
   <div class="tab" onclick="showTab('scheduled',this)">📅 Scheduled <span class="cnt">11</span></div>
+  <div style="margin-left:auto;display:flex;align-items:center;padding:0 4px;">
+    <button class="btn" onclick="openTgtModal()" style="font-size:11px;padding:4px 12px;">✏️ Edit Targets</button>
+  </div>
 </div>
 
 <div class="main">
@@ -889,6 +908,128 @@ function renderOverview() {
     ? `Showing ${totalShown} respondent${totalShown !== 1 ? 's' : ''}` : '';
   empty.style.display = totalShown === 0 ? 'block' : 'none';
   container.style.display = totalShown === 0 ? 'none' : '';
+}
+
+// ───────────────────────────────────────────────
+// EDIT TARGETS MODAL
+// ───────────────────────────────────────────────
+const TARGETS_DEFAULT = JSON.parse(JSON.stringify(TARGETS)); // deep copy for reset
+
+const TGT_CONFIG = [
+  { key:'overall', label:'Overall sample per market', type:'overall' },
+  { key:'q13', label:'Q13 · Processor Brands (min respondents with brand in org)', type:'flat', brands:['AMD','Intel','Apple (M-series)','Qualcomm'] },
+  { key:'q14', label:'Q14 · PC Research Resources (min respondents using resource)', type:'flat', brands:['Processor mfr website','Online retailer'] },
+  { key:'q5',  label:'Q5 · Seniority (min per tier)', type:'perLabel', labels:['Director','Executive / Senior Leader','Manager / Team Leader','Associate / Specialist / Engineer / Administrator'] },
+  { key:'q10', label:'Q10 · Fortune / Listed (min Fortune 1000 respondents)', type:'fortune' },
+];
+
+const MKTS = ['US','UK','DE','JP','IN'];
+const MKT_LABELS = {US:'US',UK:'UK',DE:'DE',JP:'JP (Nikkei)',IN:'India'};
+
+function openTgtModal() {
+  document.getElementById('tgt-modal-bg').style.display = 'block';
+  renderTgtEditor();
+}
+
+function closeTgtModal() {
+  document.getElementById('tgt-modal-bg').style.display = 'none';
+}
+
+function renderTgtEditor() {
+  let html = '';
+
+  TGT_CONFIG.forEach(cfg => {
+    html += `<div style="margin-bottom:22px;">
+      <div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bdr)">${cfg.label}</div>`;
+
+    if (cfg.type === 'overall') {
+      html += `<div style="display:flex;gap:12px;flex-wrap:wrap;">`;
+      MKTS.forEach(m => {
+        const v = TARGETS.overall[m] || 0;
+        html += `<label style="font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px;align-items:center">
+          <span>${MKT_LABELS[m]}</span>
+          <input type="number" min="0" max="50" value="${v}" style="${tgtInputStyle()}"
+            onchange="TARGETS.overall['${m}']=+this.value;renderOverview()">
+        </label>`;
+      });
+      html += `</div>`;
+    }
+
+    else if (cfg.type === 'flat') {
+      html += `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr><th style="text-align:left;padding:3px 0;color:var(--muted);font-weight:600">Brand / Resource</th>
+        ${MKTS.map(m=>`<th style="text-align:center;color:var(--muted);font-weight:600;padding:3px 6px">${MKT_LABELS[m]}</th>`).join('')}
+        </tr>`;
+      cfg.brands.forEach(brand => {
+        html += `<tr><td style="padding:3px 0;color:var(--txt)">${brand}</td>`;
+        MKTS.forEach(m => {
+          const v = TARGETS[cfg.key][m]?.[brand]?.min ?? '';
+          html += `<td style="text-align:center;padding:2px 4px">
+            <input type="number" min="0" max="20" value="${v}" style="${tgtInputStyle()}"
+              onchange="setNestedTgt('${cfg.key}','${m}','${brand}',+this.value);renderOverview()">
+          </td>`;
+        });
+        html += `</tr>`;
+      });
+      html += `</table>`;
+    }
+
+    else if (cfg.type === 'perLabel') {
+      html += `<table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <tr><th style="text-align:left;padding:3px 0;color:var(--muted);font-weight:600">Seniority tier</th>
+        ${MKTS.map(m=>`<th style="text-align:center;color:var(--muted);font-weight:600;padding:3px 6px">${MKT_LABELS[m]}</th>`).join('')}
+        </tr>`;
+      cfg.labels.forEach(lbl => {
+        const shortLbl = lbl.replace('Associate / Specialist / Engineer / Administrator','Hands-on technical').replace('Executive / Senior Leader','Executive / Sr Leader');
+        html += `<tr><td style="padding:3px 0;color:var(--txt)">${shortLbl}</td>`;
+        MKTS.forEach(m => {
+          const v = TARGETS[cfg.key][m]?.[lbl]?.min ?? '';
+          html += `<td style="text-align:center;padding:2px 4px">
+            <input type="number" min="0" max="10" value="${v}" style="${tgtInputStyle()}"
+              onchange="setNestedTgt('${cfg.key}','${m}','${encodeURIComponent(lbl)}',+this.value,true);renderOverview()">
+          </td>`;
+        });
+        html += `</tr>`;
+      });
+      html += `</table>`;
+    }
+
+    else if (cfg.type === 'fortune') {
+      const fortuneKeys = {US:'Fortune 1000', UK:'Fortune 1000', DE:'Fortune 1000', JP:'Nikkei 225', IN:'Fortune 1000'};
+      html += `<div style="display:flex;gap:12px;flex-wrap:wrap;">`;
+      MKTS.forEach(m => {
+        const fkey = fortuneKeys[m];
+        const v = TARGETS.q10[m]?.[fkey]?.min ?? '';
+        html += `<label style="font-size:11px;color:var(--muted);display:flex;flex-direction:column;gap:3px;align-items:center">
+          <span>${MKT_LABELS[m]}</span>
+          <input type="number" min="0" max="10" value="${v}" style="${tgtInputStyle()}"
+            onchange="setNestedTgt('q10','${m}','${fkey}',+this.value);renderOverview()">
+        </label>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  document.getElementById('tgt-editor-body').innerHTML = html;
+}
+
+function tgtInputStyle() {
+  return 'width:46px;text-align:center;border:1px solid var(--bdr);border-radius:4px;padding:3px 4px;font-size:11px;font-family:inherit;background:#fff;';
+}
+
+function setNestedTgt(dim, mkt, label, val, encoded) {
+  const key = encoded ? decodeURIComponent(label) : label;
+  if (!TARGETS[dim][mkt]) TARGETS[dim][mkt] = {};
+  if (!TARGETS[dim][mkt][key]) TARGETS[dim][mkt][key] = {};
+  TARGETS[dim][mkt][key].min = val;
+}
+
+function resetTargets() {
+  Object.assign(TARGETS, JSON.parse(JSON.stringify(TARGETS_DEFAULT)));
+  renderTgtEditor();
+  renderOverview();
 }
 
 // ───────────────────────────────────────────────
