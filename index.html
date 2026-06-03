@@ -71,6 +71,8 @@
   .s-invited  { background: #2C5F8A; }
   .s-prescreen{ background: #C27C00; }
   .s-backup   { background: #999; }
+  .s-scheduling { background: #C27C00; }
+  .s-unresponsive { background: #BBB; }
   .s-hold     { background: #AAAAAA; }
   .s-noshow { background: #C0504A; }
   .s-pipe   { background: #7B8EA8; }
@@ -88,6 +90,9 @@
   .p-pipe     { background:#E8EEF5; color:#4A6080; }
   .p-prescreen{ background:#FFF0D9; color:#8A5A00; }
   .p-backup   { background:#ECECEC; color:#666; }
+  .p-scheduling{ background:#FFF3CD; color:#6D4C00; border:1px dashed #C27C00; }
+  .p-unresponsive{ background:#F5F5F5; color:#999; border:1px dashed #bbb; }
+  .p-disqualified{ background:#F8D7DA; color:#721C24; }
 
   /* QUOTA ACCORDION */
   .qa { margin-top: 2px; border: 1px solid var(--bdr); border-radius: 6px; overflow: hidden; }
@@ -224,14 +229,15 @@
 </div>
 
 <div class="sumbar">
-  <div class="sstat"><span class="v" style="color:var(--pink)">36</span><span class="l">Total in Grid</span></div>
-  <div class="sstat"><span class="v" style="color:#27AE60">6</span><span class="l">Completed</span></div>
-  <div class="sstat"><span class="v" style="color:var(--pink)">11</span><span class="l">Scheduled</span></div>
+  <div class="sstat"><span class="v" style="color:var(--pink)">35</span><span class="l">Total in Grid</span></div>
+  <div class="sstat"><span class="v" style="color:#27AE60">10</span><span class="l">Completed</span></div>
+  <div class="sstat"><span class="v" style="color:var(--pink)">9</span><span class="l">Scheduled</span></div>
   <div class="sstat"><span class="v" style="color:#2C5F8A">5</span><span class="l">Approved / Invited</span></div>
-  <div class="sstat"><span class="v" style="color:#856404">7</span><span class="l">New</span></div>
-  <div class="sstat"><span class="v" style="color:#C27C00">2</span><span class="l">Prescreen</span></div>
-  <div class="sstat"><span class="v" style="color:#999">2</span><span class="l">Backup</span></div>
-  <div class="sstat"><span class="v" style="color:#AAAAAA">3</span><span class="l">On Hold</span></div>
+  <div class="sstat"><span class="v" style="color:#856404">2</span><span class="l">New</span></div>
+  <div class="sstat"><span class="v" style="color:#AAAAAA">2</span><span class="l">On Hold</span></div>
+  <div class="sstat"><span class="v" style="color:#BBB">4</span><span class="l">Unresponsive</span></div>
+  <div class="sstat"><span class="v" style="color:#721C24">1</span><span class="l">Disqualified</span></div>
+  <div class="sstat"><span class="v" style="color:#C0504A">1</span><span class="l">Cancelled</span></div>
 </div>
 
 <!-- EDIT TARGETS MODAL -->
@@ -252,13 +258,13 @@
 
 <div class="tabs">
   <div class="tab active" onclick="showTab('overview',this)">Overview <span class="cnt">5</span></div>
-  <div class="tab" onclick="showTab('all',this)">All Respondents <span class="cnt">36</span></div>
-  <div class="tab" onclick="showTab('uk',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="UK"> United Kingdom <span class="cnt">5</span></div>
-  <div class="tab" onclick="showTab('us',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:14px;vertical-align:middle;border-radius:2px;" alt="US"> United States <span class="cnt">6</span></div>
+  <div class="tab" onclick="showTab('all',this)">All Respondents <span class="cnt">35</span></div>
+  <div class="tab" onclick="showTab('uk',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCAzMCI+CiAgPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMDEyMTY5Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgPHBhdGggZD0iTTAsMCBMNjAsMzAgTTYwLDAgTDAsMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEwIi8+CiAgPHBhdGggZD0iTTMwLDAgVjMwIE0wLDE1IEg2MCIgc3Ryb2tlPSIjQzgxMDJFIiBzdHJva2Utd2lkdGg9IjYiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="UK"> United Kingdom <span class="cnt">4</span></div>
+  <div class="tab" onclick="showTab('us',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjEwIiBmaWxsPSIjQjIyMjM0Ii8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjAuNzciIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iMi4zMSIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSIzLjg1IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjE5IiBoZWlnaHQ9IjAuNzciIHk9IjUuMzgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB3aWR0aD0iMTkiIGhlaWdodD0iMC43NyIgeT0iNi45MiIgZmlsbD0iI2ZmZiIvPgogIDxyZWN0IHdpZHRoPSIxOSIgaGVpZ2h0PSIwLjc3IiB5PSI4LjQ2IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjcuNiIgaGVpZ2h0PSI1LjM4IiBmaWxsPSIjM0MzQjZFIi8+Cjwvc3ZnPg==" style="height:14px;vertical-align:middle;border-radius:2px;" alt="US"> United States <span class="cnt">4</span></div>
   <div class="tab" onclick="showTab('de',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgogIDxyZWN0IHdpZHRoPSI1IiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KICA8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSIxIiB5PSIxIiBmaWxsPSIjRDAwIi8+CiAgPHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iMSIgeT0iMiIgZmlsbD0iI0ZGQ0UwMCIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="DE"> Germany <span class="cnt">6</span></div>
-  <div class="tab" onclick="showTab('jp',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan <span class="cnt">11</span></div>
-  <div class="tab" onclick="showTab('in',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India <span class="cnt">8</span></div>
-  <div class="tab" onclick="showTab('scheduled',this)">📅 Scheduled <span class="cnt">11</span></div>
+  <div class="tab" onclick="showTab('jp',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSIxLjUiIGN5PSIxIiByPSIwLjYiIGZpbGw9IiNCQzAwMkQiLz4KPC9zdmc+" style="height:14px;vertical-align:middle;border-radius:2px;" alt="JP"> Japan <span class="cnt">12</span></div>
+  <div class="tab" onclick="showTab('in',this)"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDIiPgogIDxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjAuNjY3IiBmaWxsPSIjRkY5OTMzIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjAuNjY3IiBmaWxsPSIjZmZmIi8+CiAgPHJlY3Qgd2lkdGg9IjMiIGhlaWdodD0iMC42NjciIHk9IjEuMzMzIiBmaWxsPSIjMTM4ODA4Ii8+CiAgPGNpcmNsZSBjeD0iMS41IiBjeT0iMSIgcj0iMC4xODUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjA0Ii8+CiAgPGxpbmUgeDE9IjEuNSIgeTE9IjAuODE1IiB4Mj0iMS41IiB5Mj0iMS4xODUiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgogIDxsaW5lIHgxPSIxLjMxNSIgeTE9IjEiIHgyPSIxLjY4NSIgeTI9IjEiIHN0cm9rZT0iIzAwMDA4MCIgc3Ryb2tlLXdpZHRoPSIwLjAyNSIvPgo8L3N2Zz4=" style="height:14px;vertical-align:middle;border-radius:2px;" alt="IN"> India <span class="cnt">9</span></div>
+  <div class="tab" onclick="showTab('scheduled',this)">📅 Scheduled <span class="cnt">9</span></div>
   <div style="margin-left:auto;display:flex;align-items:center;padding:0 4px;">
     <button class="btn" onclick="openTgtModal()" style="font-size:11px;padding:4px 12px;">✏️ Edit Targets</button>
   </div>
@@ -291,6 +297,9 @@
         <button class="ov-btn ov-new"      data-val="New"                onclick="setOvFilter('status','New',this)">New</button>
         <button class="ov-btn ov-prescreen"data-val="Prescreen"          onclick="setOvFilter('status','Prescreen',this)">Prescreen</button>
         <button class="ov-btn ov-backup"   data-val="Backup"             onclick="setOvFilter('status','Backup',this)">Backup</button>
+        <button class="ov-btn ov-scheduling"  data-val="Scheduling"   onclick="setOvFilter('status','Scheduling',this)">Scheduling</button>
+        <button class="ov-btn ov-unresponsive" data-val="Unresponsive" onclick="setOvFilter('status','Unresponsive',this)">Unresponsive</button>
+        <button class="ov-btn ov-unresponsive" data-val="Disqualified" onclick="setOvFilter('status','Disqualified',this)">Disqualified</button>
         <button class="ov-btn ov-hold"     data-val="On Hold"            onclick="setOvFilter('status','On Hold',this)">On Hold</button>
         <button class="ov-btn ov-noshow"   data-val="No Show"            onclick="setOvFilter('status','No Show',this)">No Show</button>
         <button class="ov-btn ov-noshow"   data-val="Cancelled"          onclick="setOvFilter('status','Cancelled',this)">Cancelled</button>
@@ -324,6 +333,9 @@
         <option value="Approved / Invited">Approved / Invited</option>
         <option value="Prescreen">Prescreen</option>
         <option value="Backup">Backup</option>
+        <option value="Scheduling">Scheduling</option>
+        <option value="Unresponsive">Unresponsive</option>
+        <option value="Disqualified">Disqualified</option>
         <option value="No Show">No Show</option>
         <option value="Cancelled">Cancelled</option>
       </select>
@@ -365,47 +377,46 @@
 // DATA
 // ───────────────────────────────────────────────
 const R = [
-  // UK
-  {n:3,mkt:"UK",name:"Stuart",status:"Scheduled",appt:"3 Jun 2026",time:"12pm BST (7am ET)",sortKey:"2026-06-03T07:00",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Qualcomm","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Elvin"},
-  {n:2,mkt:"UK",name:"Eduardo",status:"Scheduled",appt:"3 Jun 2026",time:"2pm BST (9am ET)",sortKey:"2026-06-03T09:00",industry:"Consumer Products",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Computer brand website"],moderator:"Fran"},
-  {n:1,mkt:"UK",name:"Mark",status:"Approved / Invited",appt:"8/9/10 June TBC",time:"",sortKey:"",industry:"Manufacturing",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Samsung (Exynos)"],q14:["Online retailer","Computer brand website"],moderator:""},
-  {n:4,mkt:"UK",name:"Martin W",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Retail",seniority:"Director",orgSize:"1,000-4,999",fortune:"No",q13:["Intel"],q14:["Online retailer","Physical store"],moderator:""},
-  {n:5,mkt:"UK",name:"David",status:"New",appt:"5 Jun / 7 Jun 2026",time:"",sortKey:"",industry:"Technology",seniority:"Executive / Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website"],moderator:""},
-  // US
-  {n:1,mkt:"US",name:"Rahul P",status:"Completed",appt:"29 May 2026",time:"14:30 ET",sortKey:"2026-05-29T14:30",industry:"Banking, and Other Financial Services",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Online retailer","Computer brand website"],moderator:"Fran"},
-  {n:2,mkt:"US",name:"Aditya M",status:"Approved / Invited",appt:"1 Jun / 4 Jun 2026",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm","Samsung (Exynos)","ARM-based (other)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
-  {n:3,mkt:"US",name:"Ahmad K",status:"Approved / Invited",appt:"2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Healthcare",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
-  {n:4,mkt:"US",name:"Jason S",status:"New",appt:"",time:"",sortKey:"",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
-  {n:5,mkt:"US",name:"Joe B",status:"On Hold",appt:"1 Jun / 2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Healthcare",seniority:"Executive / Senior Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD","Apple (M-series)","Qualcomm"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website","Second-hand/refurbished","Other"],moderator:""},
-  {n:6,mkt:"US",name:"Andrew F",status:"New",appt:"2 Jun / 3 Jun 2026",time:"",sortKey:"",industry:"Education & Non-Profit",seniority:"Director",orgSize:"50-99",fortune:"No",q13:["Intel","Qualcomm"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
-  // DE
+  // UK,
+  {n:1,mkt:"UK",name:"Eduardo",status:"Completed",appt:"3 Jun 2026",time:"2pm BST (9am ET)",sortKey:"2026-06-03T09:00",industry:"Consumer Products",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Fran"},
+  {n:2,mkt:"UK",name:"Stuart",status:"Scheduled",appt:"4 Jun 2026",time:"12:00 BST (7am ET)",sortKey:"2026-06-04T07:00",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Qualcomm","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Elvin"},
+  {n:3,mkt:"UK",name:"David",status:"Approved / Invited",appt:"5 Jun 2026",time:"5pm BST (12pm ET)",sortKey:"",industry:"Technology",seniority:"Executive/Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website"],moderator:""},
+  {n:6,mkt:"UK",name:"Mark",status:"Unresponsive",appt:"8/9/10 June TBC",time:"",sortKey:"",industry:"Manufacturing",seniority:"Executive/Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","Apple (M-series)","Samsung (Exynos)"],q14:["Online retailer","Computer brand website"],moderator:""},
+  // US,
+  {n:1,mkt:"US",name:"Rahul P",status:"Completed",appt:"29 May 2026",time:"14:30 ET",sortKey:"2026-05-29T14:30",industry:"Banking, or other financial services",seniority:"Executive/Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Online retailer","Computer brand website"],moderator:"Fran"},
+  {n:2,mkt:"US",name:"Ahmad K",status:"Scheduled",appt:"Wednesday 3rd June",time:"Wed 3 Jun \u00b7 6pm BST (1pm ET)",sortKey:"2026-06-03T13:00",industry:"Healthcare",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  {n:3,mkt:"US",name:"Jason S",status:"Scheduled",appt:"Thurs 4th June",time:"Thu 4 Jun \u00b7 6pm BST (1pm ET)",sortKey:"2026-06-04T13:00",industry:"Retail",seniority:"Director",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:""},
+  {n:4,mkt:"US",name:"Aditya M",status:"Scheduled",appt:"5 Jun 2026",time:"12:00 ET",sortKey:"2026-06-05T12:00",industry:"Banking, or other financial services",seniority:"Executive/Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)","Qualcomm","Samsung (Exynos)","ARM-based (other)"],q14:["Processor mfr website","Online retailer","Computer brand website","Other"],moderator:""},
+  // DE,
   {n:1,mkt:"DE",name:"Mohamed",status:"Completed",appt:"1 Jun 2026",time:"16:45 CEST (10:45am ET)",sortKey:"2026-06-01T10:45",industry:"Transportation, Distribution and Logistics",seniority:"Manager / Team Leader",orgSize:"500-999",fortune:"Fortune 1000",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Computer brand website"],moderator:"Joshua"},
   {n:2,mkt:"DE",name:"Gregor",status:"Scheduled",appt:"9 Jun 2026",time:"11:00 CEST (5am ET)",sortKey:"2026-06-09T05:00",industry:"Technology",seniority:"Manager / Team Leader",orgSize:"500-999",fortune:"No",q13:["Intel","AMD","Qualcomm"],q14:["Online retailer","Computer brand website"],moderator:"Joshua"},
   {n:3,mkt:"DE",name:"Michael",status:"Scheduled",appt:"9 Jun 2026",time:"15:30 CEST (9:30am ET)",sortKey:"2026-06-09T09:30",industry:"Healthcare",seniority:"Director",orgSize:"500-999",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website"],moderator:"Joshua"},
-  {n:4,mkt:"DE",name:"Rüdiger",status:"Scheduled",appt:"9 Jun 2026",time:"17:00 CEST (11am ET)",sortKey:"2026-06-09T11:00",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:"Joshua"},
+  {n:4,mkt:"DE",name:"R\u00fcdiger",status:"Scheduled",appt:"9 Jun 2026",time:"17:00 CEST (11am ET)",sortKey:"2026-06-09T11:00",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:""},
   {n:5,mkt:"DE",name:"Andreas",status:"Scheduled",appt:"11 Jun 2026",time:"17:00 CEST (11am ET)",sortKey:"2026-06-11T11:00",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD"],q14:["Online retailer","Computer brand website"],moderator:"Joshua"},
   {n:6,mkt:"DE",name:"Ralf",status:"Scheduled",appt:"12 Jun 2026",time:"11:00 CEST (5am ET)",sortKey:"2026-06-12T05:00",industry:"Energy & Utilities",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)"],q14:["Computer brand website"],moderator:"Joshua"},
-  // JP
-  {n:1,mkt:"JP",name:"ID1320",status:"Scheduled",appt:"3 Jun 2026",time:"19:00 JST (6am ET)",sortKey:"2026-06-03T06:00",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
-  {n:2,mkt:"JP",name:"ID1832",status:"Scheduled",appt:"3 Jun 2026",time:"20:30 JST (7:30am ET)",sortKey:"2026-06-03T07:30",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
-  {n:3,mkt:"JP",name:"ID2146",status:"Approved / Invited",appt:"",time:"",sortKey:"",industry:"Healthcare",seniority:"Director",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
-  {n:4,mkt:"JP",name:"ID4988",status:"Prescreen",appt:"",time:"",sortKey:"",industry:"Telecom",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD","Apple (M-series)","MediaTek","ARM-based (other)"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
-  {n:5,mkt:"JP",name:"ID128",status:"Prescreen",appt:"",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Executive / Senior Leader",orgSize:"100-249",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
-  {n:6,mkt:"JP",name:"ID1055",status:"Approved / Invited",appt:"",time:"",sortKey:"",industry:"Technology",seniority:"Executive / Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:"Kazu"},
-  {n:7,mkt:"JP",name:"ID2094",status:"Backup",appt:"",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"500-999",fortune:"No",q13:["Intel","AMD"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
-  {n:8,mkt:"JP",name:"ID692",status:"Backup",appt:"",time:"",sortKey:"",industry:"Other",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
-  {n:9,mkt:"JP",name:"ID1229",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Insurance",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website","Other"],moderator:"Kazu"},
-  {n:10,mkt:"JP",name:"ID1899",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
-  {n:11,mkt:"JP",name:"ID3265",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
-  // IN
-  {n:3,mkt:"IN",name:"Lalit M",status:"Completed",appt:"28 May 2026",time:"6:00pm IST (8:30am ET)",sortKey:"2026-05-28T08:30",industry:"Manufacturing",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
-  {n:5,mkt:"IN",name:"Suhana S",status:"Completed",appt:"29 May 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-05-29T07:30",industry:"Other",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
-  {n:8,mkt:"IN",name:"Ganesh K",status:"Completed",appt:"1 Jun 2026",time:"7:00pm IST (9:30am ET)",sortKey:"2026-06-01T09:30",industry:"Other",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
-  {n:4,mkt:"IN",name:"Deepak P",status:"Completed",appt:"1 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-01T11:00",industry:"Retail",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Computer brand website"],moderator:"Shilpa"},
-  {n:7,mkt:"IN",name:"Hari Raghavan",status:"Scheduled",appt:"2 Jun 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-06-02T07:30",industry:"Telecom",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
-  {n:6,mkt:"IN",name:"Jogendra B",status:"Scheduled",appt:"2 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-02T11:00",industry:"Other",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
+  // JP,
+  {n:1,mkt:"JP",name:"ID1320",status:"Unresponsive",appt:"TBC",time:"",sortKey:"",industry:"Manufacturing",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
+  {n:2,mkt:"JP",name:"ID1832",status:"Unresponsive",appt:"TBC",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:3,mkt:"JP",name:"ID2146",status:"Approved / Invited",appt:"TBC",time:"",sortKey:"",industry:"Healthcare",seniority:"Director",orgSize:"1,000-4,999",fortune:"Nikkei 225",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
+  {n:4,mkt:"JP",name:"ID4988",status:"Approved / Invited",appt:"TBC",time:"",sortKey:"",industry:"Telecom",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD","Apple (M-series)","MediaTek","ARM-based (other)"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:5,mkt:"JP",name:"ID128",status:"Disqualified",appt:"TBC",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Executive / Senior Leader",orgSize:"100-249",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store"],moderator:"Kazu"},
+  {n:6,mkt:"JP",name:"ID1055",status:"Completed",appt:"June 3rd",time:"20:30 JST (7:30am ET)",sortKey:"2026-06-03T07:30",industry:"Technology",seniority:"Executive / Senior Leader",orgSize:"250-499",fortune:"No",q13:["Intel","AMD"],q14:["Processor mfr website","Computer brand website"],moderator:"Kazu"},
+  {n:7,mkt:"JP",name:"ID2094",status:"On Hold",appt:"TBC",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Director",orgSize:"500-999",fortune:"No",q13:["Intel","AMD"],q14:["Online retailer","Physical store","Computer brand website"],moderator:"Kazu"},
+  {n:8,mkt:"JP",name:"ID692",status:"On Hold",appt:"TBC",time:"",sortKey:"",industry:"Other (Accouting BPO)",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
+  {n:9,mkt:"JP",name:"ID1229",status:"Approved / Invited",appt:"TBC",time:"",sortKey:"",industry:"Insurance",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Physical store","Computer brand website","Other"],moderator:"Kazu"},
+  {n:10,mkt:"JP",name:"ID1899",status:"Unresponsive",appt:"TBC",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Kazu"},
+  {n:11,mkt:"JP",name:"ID3265",status:"Approved / Invited",appt:"TBC",time:"",sortKey:"",industry:"Energy & Utilities",seniority:"Director",orgSize:"5,000+",fortune:"Nikkei 225",q13:["Intel","AMD"],q14:["Processor mfr website","Online retailer"],moderator:"Kazu"},
+  {n:12,mkt:"JP",name:"ID2266",status:"New",appt:"TBC",time:"",sortKey:"",industry:"Manufacturing",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"250-499",fortune:"No",q13:["Intel","Apple (M-series)"],q14:["Processor mfr website","Computer brand website"],moderator:"Kazu"},
+  // IN,
   {n:1,mkt:"IN",name:"Ketan",status:"On Hold",appt:"",time:"",sortKey:"",industry:"Telecom",seniority:"Director",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)","ARM-based (other)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
-  {n:9,mkt:"IN",name:"Mohan Raj",status:"On Hold",appt:"",time:"",sortKey:"",industry:"Technology",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:2,mkt:"IN",name:"Abhilasha T",status:"Cancelled",appt:"",time:"",sortKey:"",industry:"Banking, and Other Financial Services",seniority:"Manager / Team Leader",orgSize:"100-249",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website"],moderator:""},
+  {n:3,mkt:"IN",name:"Lalit M",status:"Completed",appt:"28 May 2026",time:"6:00pm IST (8:30am ET)",sortKey:"2026-05-28T08:30",industry:"Manufacturing",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"No",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:4,mkt:"IN",name:"Deepak P",status:"Completed",appt:"1 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-01T11:00",industry:"Retails",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Computer brand website"],moderator:"Shilpa"},
+  {n:5,mkt:"IN",name:"Suhana S",status:"Completed",appt:"29 May 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-05-29T07:30",industry:"Construction",seniority:"Manager / Team Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website","Other"],moderator:"Shilpa"},
+  {n:6,mkt:"IN",name:"Jogendra B",status:"Completed",appt:"3 Jun 2026",time:"8:30pm IST (11am ET)",sortKey:"2026-06-02T11:00",industry:"Materials",seniority:"Manager / Team Leader",orgSize:"1,000-4,999",fortune:"Fortune 2000 / equivalent",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
+  {n:7,mkt:"IN",name:"Hari Raghavan",status:"Completed",appt:"2 Jun 2026",time:"5:00pm IST (7:30am ET)",sortKey:"2026-06-02T07:30",industry:"Telecommunication services",seniority:"Executive / Senior Leader",orgSize:"5,000+",fortune:"Fortune 1000",q13:["Intel","AMD","Apple (M-series)"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"},
+  {n:8,mkt:"IN",name:"Ganesh K",status:"Completed",appt:"1 Jun 2026",time:"7:00pm IST (9:30am ET)",sortKey:"2026-06-01T09:30",industry:"Logistics",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"250-499",fortune:"No",q13:["Intel","AMD","ARM-based (other)"],q14:["Processor mfr website","Online retailer"],moderator:"Shilpa"},
+  {n:9,mkt:"IN",name:"Mohan Raj",status:"New",appt:"",time:"",sortKey:"",industry:"Technology",seniority:"Associate / Specialist / Engineer / Administrator",orgSize:"500-999",fortune:"No",q13:["Intel"],q14:["Processor mfr website","Online retailer","Computer brand website"],moderator:"Shilpa"}
 ];
 
 const MKT_NAMES = {UK:"United Kingdom",US:"United States",DE:"Germany",JP:"Japan",IN:"India"};
@@ -418,7 +429,7 @@ function pill(status) {
   const map = {
     "New":"p-new","Scheduled":"p-sched","Approved":"p-approved","Approved / Invited":"p-invited",
     "On Hold":"p-hold","No Show":"p-noshow","Cancelled":"p-noshow","Completed":"p-compl","Pipeline":"p-pipe",
-    "Prescreen":"p-prescreen","Backup":"p-backup"
+    "Prescreen":"p-prescreen","Backup":"p-backup","Scheduling":"p-scheduling","Unresponsive":"p-unresponsive","Disqualified":"p-disqualified","Disqualified":"p-disqualified"
   };
   return `<span class="pill ${map[status]||'p-hold'}">${status}</span>`;
 }
@@ -493,7 +504,7 @@ const TARGETS = {
 
 // Rows that count toward quota (Completed + Scheduled)
 function confirmedRows(rows) {
-  return rows.filter(r => r.status === 'Completed' || r.status === 'Scheduled');
+  return rows.filter(r => r.status === 'Completed' || r.status === 'Scheduled' || r.status === 'Approved / Invited');
 }
 
 function countBy(rows, fn) {
@@ -630,7 +641,7 @@ function buildCard(mkt, filteredRows) {
       </div>
       <div class="mcard-body">
         ${statusBar(rows)}
-        <div class="qt-legend">Confirmed (Completed + Scheduled): <b>${nc}</b> / Target: <b>${TARGETS.overall[mkt]||'–'}</b></div>
+        <div class="qt-legend">Confirmed (Completed + Scheduled + Approved/Invited): <b>${nc}</b> / Target: <b>${TARGETS.overall[mkt]||'–'}</b></div>
         ${accordion('Q4 · Industry', q4, true)}
         ${accordion('Q5 · Seniority', q5, true)}
         ${accordion('Q9 · Org Size', q9, false)}
@@ -690,7 +701,7 @@ function buildAllCountriesCard(rows) {
       </div>
       <div class="mcard-body">
         ${statusBar(rows)}
-        <div class="qt-legend">Confirmed (Completed + Scheduled): <b>${nc}</b> / Total target: <b>${totalTarget}</b> &nbsp;·&nbsp; Targets shown are sums across all visible markets</div>
+        <div class="qt-legend">Confirmed (Completed + Scheduled + Approved/Invited): <b>${nc}</b> / Total target: <b>${totalTarget}</b> &nbsp;·&nbsp; Targets shown are sums across all visible markets</div>
         ${accordion('Q4 · Industry', q4, true)}
         ${accordion('Q5 · Seniority', q5, true)}
         ${accordion('Q9 · Org Size', q9, false)}
